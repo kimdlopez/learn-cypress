@@ -87,3 +87,53 @@ describe("POST Tasks API", () => {
     });
   });
 });
+
+describe("PATCH Tasks API", () => {
+  it("should update the task with the given id", () => {
+    cy.request("PATCH", "/api/tasks/2", { title: "Learn API Testing" }).then(
+      (response) => {
+        expect(response.status).to.eq(200);
+        expect(response.body.title).to.eq("Learn API Testing");
+      }
+    );
+  });
+
+  it("should return 400 if title is missing", () => {
+    cy.request({
+      method: "PATCH",
+      url: "/api/tasks/2",
+      body: { title: "" },
+      failOnStatusCode: false,
+    }).then((response) => {
+      expect(response.status).to.eq(400);
+      expect(response.body.name).to.eq("BadRequestError");
+      expect(response.body.message).to.eq("Task title is required.");
+    });
+  });
+
+  it("should return 400 if completed has invalid value", () => {
+    cy.request({
+      method: "PATCH",
+      url: "/api/tasks/2",
+      body: { completed: "maybe" },
+      failOnStatusCode: false,
+    }).then((response) => {
+      expect(response.status).to.eq(400);
+      expect(response.body.name).to.eq("BadRequestError");
+      expect(response.body.message).to.eq("Invalid value for completed.");
+    });
+  });
+
+  it("should return a 404 if the task is not found", () => {
+    cy.request({
+      method: "PATCH",
+      url: "/api/tasks/100",
+      failOnStatusCode: false,
+    }).then((response) => {
+      expect(response.status).to.eq(404);
+
+      expect(response.body).to.have.property("name", "NotFoundError");
+      expect(response.body).to.have.property("message", "Task not found");
+    });
+  });
+});
