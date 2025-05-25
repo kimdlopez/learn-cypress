@@ -137,3 +137,23 @@ describe("PATCH Tasks API", () => {
     });
   });
 });
+
+describe("DELETE Tasks API", () => {
+  it("should delete the tasks with the given id", () => {
+    cy.request("DELETE", "/api/tasks/3").then((response) => {
+      expect(response.status).to.eq(204);
+    });
+  });
+
+  it("should return a 404 if the task is not found", () => {
+    cy.request({
+      method: "DELETE",
+      url: "/api/tasks/100",
+      failOnStatusCode: false,
+    }).then((response) => {
+      expect(response.status).to.eq(404);
+      expect(response.body).to.have.property("name", "NotFoundError");
+      expect(response.body).to.have.property("message", "Task not found");
+    });
+  });
+});
