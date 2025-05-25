@@ -57,3 +57,33 @@ describe("GET Tasks", () => {
     });
   });
 });
+
+// () => {} // -> f(x), x is nothing
+
+// (response) => { } // f(x) , x = response
+
+describe("POST Tasks API", () => {
+  it("should create a new task", () => {
+    cy.request("POST", "/api/tasks", { title: "New Task po" }).then(
+      (response) => {
+        expect(response.status).to.eq(201);
+        expect(response.body.title).to.eq("New Task po");
+        expect(response.body).to.have.property("id");
+        expect(response.body).to.have.property("completed", false);
+      }
+    );
+  });
+
+  it("should return 400 if title is missing", () => {
+    cy.request({
+      method: "POST",
+      url: "/api/tasks",
+      body: { title: "" },
+      failOnStatusCode: false,
+    }).then((response) => {
+      expect(response.status).to.eq(400);
+      expect(response.body.name).to.eq("BadRequestError");
+      expect(response.body.message).to.eq("Task title is required.");
+    });
+  });
+});
